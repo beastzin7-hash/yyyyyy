@@ -4,7 +4,7 @@ const router: IRouter = Router();
 const ADMIN_SESSION_COOKIE = "roblox_prank_admin";
 const DEFAULT_USERNAME = "beastrobux";
 const DEFAULT_PASSWORD = "robux99";
-const ADMIN_PASSWORD = "BeastAdmin2026";
+const ADMIN_PASSWORD = "BeastRobuxAdmin66";
 
 // This app is a demo. Keep access credentials separate from Roblox accounts and
 // do not persist visitor passwords or Roblox credentials.
