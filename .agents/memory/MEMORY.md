@@ -1,0 +1,1 @@
+- [Roblox Prank safety boundary](roblox-prank-safety.md) — keep the experience clearly unofficial and never collect real Roblox credentials.

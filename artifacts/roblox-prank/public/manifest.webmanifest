@@ -1,0 +1,19 @@
+{
+  "name": "Roblox Prank",
+  "short_name": "Roblox Prank",
+  "description": "Experiencia de Robux de demostración, no oficial.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#2f55ff",
+  "icons": [
+    {
+      "src": "/roblox-prank-logo.jpeg",
+      "sizes": "400x400",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
