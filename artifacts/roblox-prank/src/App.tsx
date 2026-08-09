@@ -5,7 +5,7 @@ import SendRobuxSheet from "./components/SendRobuxSheet";
 import LoginGate from "./components/LoginGate";
 import AdminPage from "./pages/AdminPage";
 import { Currency } from "./lib/currency";
-import { Language, languageCurrency } from "./lib/i18n";
+import { Language } from "./lib/i18n";
 
 export interface RobuxPackage {
   id: number;
@@ -46,11 +46,6 @@ export default function App() {
     setLanguage(nextLanguage);
   };
 
-  const handleStoreLanguageChange = (nextLanguage: Language) => {
-    setLanguage(nextLanguage);
-    setCurrency(languageCurrency(nextLanguage));
-  };
-
   const handleSelect = (pkg: RobuxPackage) => {
     setSelected(pkg);
     setModalState("loading");
@@ -84,7 +79,6 @@ export default function App() {
           onSend={() => setSendOpen(true)}
           currency={currency}
           language={language}
-          onLanguageChange={handleStoreLanguageChange}
         />
       </div>
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { PACKAGES, RobuxPackage } from "../App";
 import RobuxIcon from "../components/RobuxIcon";
 import { Currency, formatCurrency, hasExactStorePrice } from "../lib/currency";
-import { LANGUAGES, Language, numberLocale, t } from "../lib/i18n";
+import { Language, numberLocale, t } from "../lib/i18n";
 
 interface Props {
   onSelect: (pkg: RobuxPackage) => void;
@@ -10,7 +10,6 @@ interface Props {
   onSend: () => void;
   currency: Currency;
   language: Language;
-  onLanguageChange: (language: Language) => void;
 }
 
 const FAQ_ITEMS = [
@@ -19,7 +18,7 @@ const FAQ_ITEMS = [
   { q: "¿Los Robux caducan?", a: "No, los Robux no caducan mientras tu cuenta esté activa." },
 ];
 
-export default function BuyPage({ onSelect, robuxBalance, onSend, currency, language, onLanguageChange }: Props) {
+export default function BuyPage({ onSelect, robuxBalance, onSend, currency, language }: Props) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [plusCard, setPlusCard] = useState(0);
   const visiblePackages = PACKAGES.filter(pkg =>
@@ -67,25 +66,6 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
           </svg>
           <span style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>{t(language, "send")}</span>
         </button>
-        <select
-          value={language}
-          onChange={event => onLanguageChange(event.target.value as Language)}
-          aria-label={t(language, "chooseLanguage")}
-          style={{
-            border: "1px solid #e2e2e2",
-            borderRadius: 9,
-            background: "#fff",
-            padding: "7px 8px",
-            color: "#333",
-            fontFamily: "inherit",
-            fontSize: 12,
-            fontWeight: 700,
-          }}
-        >
-          {LANGUAGES.map(option => (
-            <option key={option.code} value={option.code}>{option.label}</option>
-          ))}
-        </select>
       </div>
 
       {/* Title */}
