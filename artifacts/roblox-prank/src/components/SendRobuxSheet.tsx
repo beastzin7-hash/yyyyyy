@@ -305,9 +305,19 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
               <div style={{ padding: "0 16px 12px" }}>
                 <input
                   ref={inputRef}
-                  type="text"
-                  inputMode="text"
+                  type="search"
+                  inputMode="search"
+                  name="search"
                   autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  enterKeyHint="search"
+                  aria-label={t(language, "searchUsername")}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
+                  data-form-type="other"
                   value={query}
                   onChange={e => handleQueryChange(e.target.value)}
                    placeholder={t(language, "searchUsername")}
