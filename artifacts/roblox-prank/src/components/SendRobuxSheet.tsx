@@ -6,6 +6,7 @@ interface Props {
   robuxBalance: number;
   onClose: () => void;
   onSend: (amount: number) => void;
+  onRbxOpen: () => void;
   language: Language;
 }
 
@@ -117,10 +118,12 @@ function SendRobuxHeader({
   robuxBalance,
   language,
   onClose,
+  onRbxOpen,
 }: {
   robuxBalance: number;
   language: Language;
   onClose: () => void;
+  onRbxOpen: () => void;
 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 18px 10px" }}>
@@ -128,13 +131,24 @@ function SendRobuxHeader({
         <PremiumIcon />
         <span style={{ fontSize: 19, fontWeight: 700, color: "#111" }}>{t(language, "sendRobux")}</span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <RobuxIcon size={18} />
           <span style={{ fontSize: 15, fontWeight: 700, color: "#111" }}>
             {robuxBalance.toLocaleString(numberLocale(language))}
           </span>
         </div>
+          <button
+            onClick={onRbxOpen}
+            aria-label="Abrir RBX"
+            style={{
+              background: "#111", border: "none", borderRadius: 8,
+              padding: "6px 9px", cursor: "pointer", fontFamily: "inherit",
+              color: "#fff", fontSize: 12, fontWeight: 800, letterSpacing: 0.2,
+            }}
+          >
+            RBX
+          </button>
         <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -145,7 +159,7 @@ function SendRobuxHeader({
   );
 }
 
-export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language }: Props) {
+export default function SendRobuxSheet({ robuxBalance, onClose, onSend, onRbxOpen, language }: Props) {
   const [step, setStep] = useState<Step>("search");
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
@@ -300,7 +314,7 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
           <>
             {/* Header — fixed, doesn't scroll */}
             <div style={{ flexShrink: 0 }}>
-              <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} />
+              <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} onRbxOpen={onRbxOpen} />
               {/* Search input */}
               <div style={{ padding: "0 16px 12px" }}>
                 <textarea
@@ -435,7 +449,7 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
         {step === "amount" && (
           <>
             <div style={{ flexShrink: 0 }}>
-              <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} />
+              <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} onRbxOpen={onRbxOpen} />
             </div>
 
             <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", alignItems: "center", padding: "16px 24px 16px", gap: 12 }}>
@@ -534,7 +548,7 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
         {step === "confirm" && (
           <>
             <div style={{ flexShrink: 0 }}>
-              <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} />
+              <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} onRbxOpen={onRbxOpen} />
             </div>
 
             <div style={{ flex: 1, overflowY: "auto", padding: "0 16px 16px" }}>

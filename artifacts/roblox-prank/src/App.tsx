@@ -4,6 +4,7 @@ import PaymentModal from "./components/PaymentModal";
 import SendRobuxSheet from "./components/SendRobuxSheet";
 import LoginGate from "./components/LoginGate";
 import AdminPage from "./pages/AdminPage";
+import RbxPreviewModal from "./components/RbxPreviewModal";
 import { Currency } from "./lib/currency";
 import { Language } from "./lib/i18n";
 
@@ -37,6 +38,7 @@ export default function App() {
   const [modalState, setModalState] = useState<ModalState>("idle");
   const [robuxBalance, setRobuxBalance] = useState(0);
   const [sendOpen, setSendOpen] = useState(false);
+  const [rbxPreviewOpen, setRbxPreviewOpen] = useState(false);
 
   if (isAdminRoute) {
     return <AdminPage />;
@@ -67,7 +69,7 @@ export default function App() {
       setCurrency(selectedCurrency);
       setLanguage(selectedLanguage);
       setRobuxBalance(initialRobux);
-    }} onLanguageChange={handleLoginLanguageChange} />;
+    }} onLanguageChange={handleLoginLanguageChange} onRbxOpen={() => setRbxPreviewOpen(true)} />;
   }
 
   return (
@@ -77,6 +79,7 @@ export default function App() {
           onSelect={handleSelect}
           robuxBalance={robuxBalance}
           onSend={() => setSendOpen(true)}
+          onRbxOpen={() => setRbxPreviewOpen(true)}
           currency={currency}
           language={language}
         />
@@ -97,6 +100,7 @@ export default function App() {
         <SendRobuxSheet
           robuxBalance={robuxBalance}
           onClose={() => setSendOpen(false)}
+          onRbxOpen={() => setRbxPreviewOpen(true)}
           onSend={(amount) => {
             setRobuxBalance(b => Math.max(0, b - amount));
             setSendOpen(false);
@@ -104,6 +108,8 @@ export default function App() {
           language={language}
         />
       )}
+
+      {rbxPreviewOpen && <RbxPreviewModal onClose={() => setRbxPreviewOpen(false)} />}
     </div>
   );
 }

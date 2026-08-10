@@ -8,6 +8,7 @@ interface Props {
   onSelect: (pkg: RobuxPackage) => void;
   robuxBalance: number;
   onSend: () => void;
+  onRbxOpen: () => void;
   currency: Currency;
   language: Language;
 }
@@ -18,10 +19,9 @@ const FAQ_ITEMS = [
   { q: "¿Los Robux caducan?", a: "No, los Robux no caducan mientras tu cuenta esté activa." },
 ];
 
-export default function BuyPage({ onSelect, robuxBalance, onSend, currency, language }: Props) {
+export default function BuyPage({ onSelect, robuxBalance, onSend, onRbxOpen, currency, language }: Props) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [plusCard, setPlusCard] = useState(0);
-  const [rbxPreviewOpen, setRbxPreviewOpen] = useState(false);
   const visiblePackages = PACKAGES.filter(pkg =>
     currency !== "USD" && currency !== "EUR" || hasExactStorePrice(currency, pkg.amount)
   );
@@ -57,7 +57,7 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button
-            onClick={() => setRbxPreviewOpen(true)}
+            onClick={onRbxOpen}
             aria-label="Abrir RBX"
             style={{
               background: "#111", border: "none", borderRadius: 10,
@@ -307,53 +307,6 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
         </div>
       </div>
 
-      {rbxPreviewOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Vista demo RBX"
-          onClick={() => setRbxPreviewOpen(false)}
-          style={{
-            position: "fixed", inset: 0, zIndex: 3000,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: 16, background: "rgba(0, 0, 0, 0.62)",
-          }}
-        >
-          <div
-            onClick={event => event.stopPropagation()}
-            style={{
-              position: "relative", width: "min(100%, 480px)", maxHeight: "calc(100vh - 32px)",
-              overflow: "auto", borderRadius: 18, background: "#fff",
-              boxShadow: "0 20px 70px rgba(0,0,0,0.3)",
-            }}
-          >
-            <button
-              onClick={() => setRbxPreviewOpen(false)}
-              aria-label="Cerrar vista RBX"
-              style={{
-                position: "absolute", top: 10, right: 10, zIndex: 1,
-                width: 36, height: 36, borderRadius: 18,
-                border: "none", background: "rgba(255,255,255,0.92)",
-                color: "#111", fontSize: 25, lineHeight: 1, cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.16)",
-              }}
-            >
-              ×
-            </button>
-            <div style={{
-              padding: "10px 16px 8px", fontSize: 12, fontWeight: 700,
-              color: "#666", textAlign: "center", letterSpacing: 0.2,
-            }}>
-              Vista demo no oficial
-            </div>
-            <img
-              src="/rbx-home-preview.png"
-              alt="Vista demo RBX"
-              style={{ display: "block", width: "100%", height: "auto" }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
