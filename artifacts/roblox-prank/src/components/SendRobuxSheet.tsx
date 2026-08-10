@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import RobuxIcon from "./RobuxIcon";
 import { Language, numberLocale, t } from "../lib/i18n";
 
@@ -77,7 +77,7 @@ const FAKE_FRIENDS: { username: string }[] = [
 
 const QUICK_AMOUNTS = [25, 50, 100, 200];
 
-function RobloxAvatar({ url, size = 44 }: { url: string | null; size?: number }) {
+const RobloxAvatar = memo(function RobloxAvatar({ url, size = 44 }: { url: string | null; size?: number }) {
   if (!url) {
     return (
       <div style={{
@@ -93,11 +93,57 @@ function RobloxAvatar({ url, size = 44 }: { url: string | null; size?: number })
   }
   return (
     <img src={url} alt="avatar" width={size} height={size}
+      decoding="async"
       style={{ borderRadius: size / 2, objectFit: "cover", background: "#e0e0e0", flexShrink: 0 }} />
+  );
+});
+
+type Step = "search" | "amount" | "confirm";
+
+function PremiumIcon() {
+  return (
+    <img
+      src="/premium-icon.webp"
+      alt="Premium"
+      width={24}
+      height={24}
+      decoding="async"
+      style={{ objectFit: "contain" }}
+    />
   );
 }
 
-type Step = "search" | "amount" | "confirm";
+function SendRobuxHeader({
+  robuxBalance,
+  language,
+  onClose,
+}: {
+  robuxBalance: number;
+  language: Language;
+  onClose: () => void;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 18px 10px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <PremiumIcon />
+        <span style={{ fontSize: 19, fontWeight: 700, color: "#111" }}>{t(language, "sendRobux")}</span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <RobuxIcon size={18} />
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#111" }}>
+            {robuxBalance.toLocaleString(numberLocale(language))}
+          </span>
+        </div>
+        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language }: Props) {
   const [step, setStep] = useState<Step>("search");
@@ -131,17 +177,29 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
     };
   }, []);
 
-  // Fetch real avatars for all friends on mount
+  // Fetch real avatars for all friends on mount. Commit once so a response
+  // arriving in the middle of a user action cannot repaint the whole list.
   useEffect(() => {
-    FAKE_FRIENDS.forEach(async ({ username }) => {
-      try {
-        const res = await fetch(`/api/roblox/user?username=${encodeURIComponent(username)}`);
-        if (res.ok) {
+    let active = true;
+
+    void Promise.all(
+      FAKE_FRIENDS.map(async ({ username }) => {
+        try {
+          const res = await fetch(`/api/roblox/user?username=${encodeURIComponent(username)}`);
+          if (!res.ok) return [username, null] as const;
           const data: RobloxUser = await res.json();
-          setFriendAvatars(prev => ({ ...prev, [username]: data.avatarUrl }));
+          return [username, data.avatarUrl] as const;
+        } catch {
+          return [username, null] as const;
         }
-      } catch { /* keep null */ }
+      }),
+    ).then(entries => {
+      if (active) setFriendAvatars(Object.fromEntries(entries));
     });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Lock body scroll
@@ -209,31 +267,6 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
     ? FAKE_FRIENDS.filter(f => f.username.toLowerCase().includes(query.toLowerCase()))
     : FAKE_FRIENDS;
 
-  // Premium "P" icon used in all headers
-  const PIcon = () => (
-    <img src="/premium-icon.webp" alt="Premium" width={24} height={24} style={{ objectFit: "contain" }} />
-  );
-
-  const Header = () => (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 18px 10px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <PIcon />
-           <span style={{ fontSize: 19, fontWeight: 700, color: "#111" }}>{t(language, "sendRobux")}</span>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <RobuxIcon size={18} />
-           <span style={{ fontSize: 15, fontWeight: 700, color: "#111" }}>{robuxBalance.toLocaleString(numberLocale(language))}</span>
-        </div>
-        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  );
-
   return (
     /* Outer container: shrinks bottom by keyboard height so sheet rides up with keyboard */
     <div style={{
@@ -267,7 +300,7 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
           <>
             {/* Header — fixed, doesn't scroll */}
             <div style={{ flexShrink: 0 }}>
-              <Header />
+              <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} />
               {/* Search input */}
               <div style={{ padding: "0 16px 12px" }}>
                 <input
@@ -394,7 +427,7 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
         {step === "amount" && (
           <>
             <div style={{ flexShrink: 0 }}>
-              <Header />
+              <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} />
             </div>
 
             <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", alignItems: "center", padding: "16px 24px 16px", gap: 12 }}>
@@ -493,7 +526,7 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
         {step === "confirm" && (
           <>
             <div style={{ flexShrink: 0 }}>
-              <Header />
+              <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} />
             </div>
 
             <div style={{ flex: 1, overflowY: "auto", padding: "0 16px 16px" }}>
