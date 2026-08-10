@@ -21,6 +21,7 @@ const FAQ_ITEMS = [
 export default function BuyPage({ onSelect, robuxBalance, onSend, currency, language }: Props) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [plusCard, setPlusCard] = useState(0);
+  const [rbxPreviewOpen, setRbxPreviewOpen] = useState(false);
   const visiblePackages = PACKAGES.filter(pkg =>
     currency !== "USD" && currency !== "EUR" || hasExactStorePrice(currency, pkg.amount)
   );
@@ -54,18 +55,31 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
             <span style={{ fontSize: 16, fontWeight: 700, color: "#222" }}>{robuxBalance.toLocaleString(numberLocale(language))}</span>
           </div>
         </div>
-        <button onClick={onSend} style={{
-          display: "flex", alignItems: "center", gap: 6,
-          background: "#f0f0f0", border: "none", borderRadius: 10,
-          padding: "8px 14px", cursor: "pointer", fontFamily: "inherit",
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-          <span style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>{t(language, "send")}</span>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button
+            onClick={() => setRbxPreviewOpen(true)}
+            aria-label="Abrir RBX"
+            style={{
+              background: "#111", border: "none", borderRadius: 10,
+              padding: "8px 13px", cursor: "pointer", fontFamily: "inherit",
+              color: "#fff", fontSize: 14, fontWeight: 800, letterSpacing: 0.3,
+            }}
+          >
+            RBX
+          </button>
+          <button onClick={onSend} style={{
+            display: "flex", alignItems: "center", gap: 6,
+            background: "#f0f0f0", border: "none", borderRadius: 10,
+            padding: "8px 14px", cursor: "pointer", fontFamily: "inherit",
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>{t(language, "send")}</span>
+          </button>
+        </div>
       </div>
 
       {/* Title */}
@@ -292,6 +306,54 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
           ))}
         </div>
       </div>
+
+      {rbxPreviewOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vista demo RBX"
+          onClick={() => setRbxPreviewOpen(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 3000,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 16, background: "rgba(0, 0, 0, 0.62)",
+          }}
+        >
+          <div
+            onClick={event => event.stopPropagation()}
+            style={{
+              position: "relative", width: "min(100%, 480px)", maxHeight: "calc(100vh - 32px)",
+              overflow: "auto", borderRadius: 18, background: "#fff",
+              boxShadow: "0 20px 70px rgba(0,0,0,0.3)",
+            }}
+          >
+            <button
+              onClick={() => setRbxPreviewOpen(false)}
+              aria-label="Cerrar vista RBX"
+              style={{
+                position: "absolute", top: 10, right: 10, zIndex: 1,
+                width: 36, height: 36, borderRadius: 18,
+                border: "none", background: "rgba(255,255,255,0.92)",
+                color: "#111", fontSize: 25, lineHeight: 1, cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.16)",
+              }}
+            >
+              ×
+            </button>
+            <div style={{
+              padding: "10px 16px 8px", fontSize: 12, fontWeight: 700,
+              color: "#666", textAlign: "center", letterSpacing: 0.2,
+            }}>
+              Vista demo no oficial
+            </div>
+            <img
+              src="/rbx-home-preview.png"
+              alt="Vista demo RBX"
+              style={{ display: "block", width: "100%", height: "auto" }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
