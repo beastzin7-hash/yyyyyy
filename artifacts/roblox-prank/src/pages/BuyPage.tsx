@@ -8,7 +8,6 @@ interface Props {
   onSelect: (pkg: RobuxPackage) => void;
   robuxBalance: number;
   onSend: () => void;
-  onRbxOpen: () => void;
   currency: Currency;
   language: Language;
 }
@@ -19,7 +18,7 @@ const FAQ_ITEMS = [
   { q: "¿Los Robux caducan?", a: "No, los Robux no caducan mientras tu cuenta esté activa." },
 ];
 
-export default function BuyPage({ onSelect, robuxBalance, onSend, onRbxOpen, currency, language }: Props) {
+export default function BuyPage({ onSelect, robuxBalance, onSend, currency, language }: Props) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [plusCard, setPlusCard] = useState(0);
   const visiblePackages = PACKAGES.filter(pkg =>
@@ -55,19 +54,7 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, onRbxOpen, cur
             <span style={{ fontSize: 16, fontWeight: 700, color: "#222" }}>{robuxBalance.toLocaleString(numberLocale(language))}</span>
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={onRbxOpen}
-            aria-label="Abrir RBX"
-            style={{
-              background: "#111", border: "none", borderRadius: 10,
-              padding: "8px 13px", cursor: "pointer", fontFamily: "inherit",
-              color: "#fff", fontSize: 14, fontWeight: 800, letterSpacing: 0.3,
-            }}
-          >
-            RBX
-          </button>
-          <button onClick={onSend} style={{
+        <button onClick={onSend} style={{
             display: "flex", alignItems: "center", gap: 6,
             background: "#f0f0f0", border: "none", borderRadius: 10,
             padding: "8px 14px", cursor: "pointer", fontFamily: "inherit",
@@ -78,8 +65,7 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, onRbxOpen, cur
               <line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
             <span style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>{t(language, "send")}</span>
-          </button>
-        </div>
+        </button>
       </div>
 
       {/* Title */}
