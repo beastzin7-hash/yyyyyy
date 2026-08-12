@@ -128,7 +128,7 @@ function SendRobuxHeader({
         <PremiumIcon />
         <span style={{ fontSize: 19, fontWeight: 700, color: "#111" }}>{t(language, "sendRobux")}</span>
       </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <RobuxIcon size={18} />
           <span style={{ fontSize: 15, fontWeight: 700, color: "#111" }}>
@@ -157,7 +157,7 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
   const [friendAvatars, setFriendAvatars] = useState<Record<string, string | null>>({});
   // Tracks how far to lift the sheet when keyboard appears
   const [keyboardOffset, setKeyboardOffset] = useState(0);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Visual viewport: keep sheet above the keyboard
@@ -303,27 +303,29 @@ export default function SendRobuxSheet({ robuxBalance, onClose, onSend, language
               <SendRobuxHeader robuxBalance={robuxBalance} language={language} onClose={onClose} />
               {/* Search input */}
               <div style={{ padding: "0 16px 12px" }}>
-                <textarea
+                <input
                   ref={inputRef}
-                  rows={1}
+                  type="search"
+                  inputMode="search"
+                  name="search"
+                  autoComplete="off"
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck={false}
                   enterKeyHint="search"
                   aria-label={t(language, "searchUsername")}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
+                  data-form-type="other"
                   value={query}
                   onChange={e => handleQueryChange(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === "Enter") e.preventDefault();
-                  }}
-                  placeholder={t(language, "searchUsername")}
+                   placeholder={t(language, "searchUsername")}
                   style={{
                     width: "100%", boxSizing: "border-box",
                     border: "2px solid #0066ff", borderRadius: 10,
                     padding: "12px 14px", fontSize: 16, fontFamily: "inherit",
                     outline: "none", color: "#111", background: "#fff",
-                    resize: "none", overflow: "hidden", display: "block",
-                    lineHeight: 1.25,
                   }}
                 />
               </div>

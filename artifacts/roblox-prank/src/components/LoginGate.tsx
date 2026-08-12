@@ -5,10 +5,9 @@ import { LANGUAGES, Language, t } from "../lib/i18n";
 interface Props {
   onEnter: (currency: Currency, language: Language, initialRobux: number) => void;
   onLanguageChange: (language: Language) => void;
-  onRbxOpen: () => void;
 }
 
-export default function LoginGate({ onEnter, onLanguageChange, onRbxOpen }: Props) {
+export default function LoginGate({ onEnter, onLanguageChange }: Props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [currency, setCurrency] = useState<Currency>("MXN");
@@ -287,48 +286,29 @@ export default function LoginGate({ onEnter, onLanguageChange, onRbxOpen }: Prop
           </svg>
         </a>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", marginTop: 12 }}>
-            <a
-              href="/admin"
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "10px 14px",
-                border: "none",
-                borderRadius: 12,
-                background: "transparent",
-                color: "#777",
-                fontSize: 13,
-                fontWeight: 650,
-                cursor: "pointer",
-                fontFamily: "inherit",
-                textDecoration: "none",
-              }}
-            >
-              {t(language, "adminLink")}
-            </a>
-            <button
-              type="button"
-              onClick={onRbxOpen}
-              aria-label="Abrir RBX"
-              style={{
-                background: "#111",
-                color: "#fff",
-                border: "none",
-                borderRadius: 8,
-                padding: "7px 10px",
-                fontFamily: "inherit",
-                fontSize: 12,
-                fontWeight: 800,
-                letterSpacing: 0.3,
-                cursor: "pointer",
-              }}
-            >
-              RBX
-            </button>
-          </div>
+          <a
+            href="/admin"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              width: "100%",
+              marginTop: 12,
+              padding: "10px 14px",
+              border: "none",
+              borderRadius: 12,
+              background: "transparent",
+              color: "#777",
+              fontSize: 13,
+              fontWeight: 650,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              textDecoration: "none",
+            }}
+          >
+            {t(language, "adminLink")}
+          </a>
       </div>
     </main>
   );

@@ -55,16 +55,16 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
           </div>
         </div>
         <button onClick={onSend} style={{
-            display: "flex", alignItems: "center", gap: 6,
-            background: "#f0f0f0", border: "none", borderRadius: 10,
-            padding: "8px 14px", cursor: "pointer", fontFamily: "inherit",
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>{t(language, "send")}</span>
+          display: "flex", alignItems: "center", gap: 6,
+          background: "#f0f0f0", border: "none", borderRadius: 10,
+          padding: "8px 14px", cursor: "pointer", fontFamily: "inherit",
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>{t(language, "send")}</span>
         </button>
       </div>
 
@@ -292,7 +292,6 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
           ))}
         </div>
       </div>
-
     </div>
   );
 }
