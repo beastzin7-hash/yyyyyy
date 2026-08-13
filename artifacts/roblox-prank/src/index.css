@@ -19,23 +19,6 @@
   to { transform: rotate(360deg); }
 }
 
-@keyframes pullRefreshSpin {
-  to { transform: rotate(360deg); }
-}
-
-.pull-refresh-spinner {
-  width: 25px;
-  height: 25px;
-  border: 4px solid rgba(30, 30, 34, 0.16);
-  border-top-color: #252529;
-  border-right-color: #252529;
-  border-radius: 50%;
-}
-
-.pull-refresh-spinner.is-refreshing {
-  animation: pullRefreshSpin 0.72s linear infinite;
-}
-
 .spinner {
   width: 36px;
   height: 36px;

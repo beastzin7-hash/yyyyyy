@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import BuyPage from "./pages/BuyPage";
 import PaymentModal from "./components/PaymentModal";
 import SendRobuxSheet from "./components/SendRobuxSheet";
@@ -29,38 +29,14 @@ export const PACKAGES: RobuxPackage[] = [
 
 export type ModalState = "idle" | "loading" | "appstore" | "success";
 
-const DEMO_SESSION_KEY = "roblox-prank-demo-session";
-
-function readDemoSession() {
-  try {
-    const raw = sessionStorage.getItem(DEMO_SESSION_KEY);
-    if (!raw) return null;
-    const session = JSON.parse(raw) as {
-      currency?: Currency;
-      language?: Language;
-      robuxBalance?: number;
-    };
-    if (!session.currency || typeof session.robuxBalance !== "number") return null;
-    return session;
-  } catch {
-    return null;
-  }
-}
-
 export default function App() {
   const isAdminRoute = window.location.pathname === "/admin";
-  const savedSession = readDemoSession();
-  const [currency, setCurrency] = useState<Currency | null>(savedSession?.currency ?? null);
-  const [language, setLanguage] = useState<Language>(savedSession?.language ?? "es");
+  const [currency, setCurrency] = useState<Currency | null>(null);
+  const [language, setLanguage] = useState<Language>("es");
   const [selected, setSelected] = useState<RobuxPackage | null>(null);
   const [modalState, setModalState] = useState<ModalState>("idle");
-  const [robuxBalance, setRobuxBalance] = useState(savedSession?.robuxBalance ?? 0);
+  const [robuxBalance, setRobuxBalance] = useState(0);
   const [sendOpen, setSendOpen] = useState(false);
-
-  useEffect(() => {
-    if (!currency) return;
-    sessionStorage.setItem(DEMO_SESSION_KEY, JSON.stringify({ currency, language, robuxBalance }));
-  }, [currency, language, robuxBalance]);
 
   if (isAdminRoute) {
     return <AdminPage />;
