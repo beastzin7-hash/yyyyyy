@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PACKAGES, RobuxPackage } from "../App";
 import RobuxIcon from "../components/RobuxIcon";
 import { Currency, formatCurrency, hasExactStorePrice } from "../lib/currency";
@@ -18,17 +18,103 @@ const FAQ_ITEMS = [
   { q: "¿Los Robux caducan?", a: "No, los Robux no caducan mientras tu cuenta esté activa." },
 ];
 
+const PULL_TO_REFRESH_TRIGGER = 82;
+
 export default function BuyPage({ onSelect, robuxBalance, onSend, currency, language }: Props) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [plusCard, setPlusCard] = useState(0);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const touchStartY = useRef<number | null>(null);
+  const pullDistanceRef = useRef(0);
+  const refreshTimer = useRef<number | null>(null);
   const featuredPackage = PACKAGES[0];
   const visiblePackages = PACKAGES.filter(pkg =>
     pkg.id !== featuredPackage.id &&
     (currency !== "USD" && currency !== "EUR" || hasExactStorePrice(currency, pkg.amount))
   );
 
+  useEffect(() => {
+    const handleTouchStart = (event: TouchEvent) => {
+      if (isRefreshing || window.scrollY > 0 || event.touches.length !== 1) return;
+      touchStartY.current = event.touches[0].clientY;
+      pullDistanceRef.current = 0;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (touchStartY.current === null || isRefreshing || window.scrollY > 0) return;
+      const distance = event.touches[0].clientY - touchStartY.current;
+
+      if (distance <= 0) {
+        pullDistanceRef.current = 0;
+        setPullDistance(0);
+        return;
+      }
+
+      event.preventDefault();
+      const nextDistance = Math.min(124, distance * 0.56);
+      pullDistanceRef.current = nextDistance;
+      setPullDistance(nextDistance);
+    };
+
+    const handleTouchEnd = () => {
+      const pulledDistance = pullDistanceRef.current;
+      touchStartY.current = null;
+
+      if (pulledDistance >= PULL_TO_REFRESH_TRIGGER && !isRefreshing) {
+        setIsRefreshing(true);
+        setPullDistance(PULL_TO_REFRESH_TRIGGER);
+        refreshTimer.current = window.setTimeout(() => window.location.reload(), 720);
+      } else {
+        pullDistanceRef.current = 0;
+        setPullDistance(0);
+      }
+    };
+
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", handleTouchEnd);
+      if (refreshTimer.current !== null) window.clearTimeout(refreshTimer.current);
+    };
+  }, [isRefreshing]);
+
   return (
-    <div style={{ background: "#fff", minHeight: "100vh" }}>
+    <div style={{
+      background: "#fff",
+      minHeight: "100vh",
+      position: "relative",
+      transform: `translateY(${pullDistance}px)`,
+      transition: pullDistance === 0 ? "transform 0.22s ease-out" : "none",
+      overscrollBehaviorY: "none",
+    }}>
+      <div
+        aria-live="polite"
+        aria-label={isRefreshing ? "Refreshing" : "Pull to refresh"}
+        style={{
+          position: "absolute",
+          top: -58,
+          left: 0,
+          right: 0,
+          height: 48,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
+          opacity: isRefreshing ? 1 : Math.min(1, pullDistance / 52),
+          transform: `scale(${isRefreshing ? 1 : 0.72 + Math.min(0.28, pullDistance / 190)}) rotate(${isRefreshing ? 0 : pullDistance * 2.8}deg)`,
+          transition: isRefreshing ? "none" : "opacity 0.08s linear",
+        }}
+      >
+        <div className={`pull-refresh-spinner${isRefreshing ? " is-refreshing" : ""}`} />
+      </div>
+
       {/* Header */}
       <div style={{
         display: "flex",
@@ -53,7 +139,7 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <RobuxIcon size={22} />
-            <span style={{ fontSize: 16, fontWeight: 700, color: "#222" }}>{robuxBalance.toLocaleString(numberLocale(language))}</span>
+            <span style={{ fontSize: 18, fontWeight: 750, letterSpacing: -0.2, color: "#222" }}>{robuxBalance.toLocaleString(numberLocale(language))}</span>
           </div>
         </div>
         <button onClick={onSend} style={{
@@ -155,7 +241,7 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
               <RobuxIcon size={24} />
-              <span style={{ fontSize: 20, fontWeight: 750, color: "#222" }}>
+              <span style={{ fontSize: 21, fontWeight: 750, letterSpacing: -0.25, color: "#222" }}>
                 {featuredPackage.amount.toLocaleString(numberLocale(language))}
               </span>
             </div>
@@ -165,7 +251,7 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
               borderRadius: 10,
               background: "#d2d5dd",
               color: "#222",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 700,
               textAlign: "center",
             }}>
@@ -188,8 +274,8 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
 
         {/* Package list */}
         <div style={{
-          border: "1px solid #e8e8e8",
-          borderRadius: 14,
+           border: "1px solid #e1e2e7",
+           borderRadius: 16,
           overflow: "hidden",
         }}>
           {visiblePackages.map((pkg, i) => (
@@ -197,14 +283,14 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              padding: "14px 16px",
+               padding: "13px 14px",
                borderBottom: i < visiblePackages.length - 1 ? "1px solid #f0f0f0" : "none",
               background: "#fff",
             }}>
               {/* Left: icon + amount */}
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <RobuxIcon size={24} />
-                <span style={{ fontSize: 20, fontWeight: 700, color: "#111" }}>
+                <span style={{ fontSize: 23, fontWeight: 750, letterSpacing: -0.35, color: "#111" }}>
                    {pkg.amount.toLocaleString(numberLocale(language))}
                 </span>
                 {pkg.recommended && (
@@ -230,12 +316,12 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
                   color: pkg.recommended ? "#fff" : "#222",
                   border: "none",
                   borderRadius: 10,
-                  padding: "10px 18px",
-                  fontSize: 15,
+                   padding: "11px 14px",
+                   fontSize: 16,
                   fontWeight: 700,
                   cursor: "pointer",
                   fontFamily: "inherit",
-                  minWidth: 100,
+                   minWidth: 132,
                   textAlign: "center",
                   transition: "opacity 0.15s",
                 }}
