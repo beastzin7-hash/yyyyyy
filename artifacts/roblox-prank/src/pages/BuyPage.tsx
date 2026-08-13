@@ -21,8 +21,10 @@ const FAQ_ITEMS = [
 export default function BuyPage({ onSelect, robuxBalance, onSend, currency, language }: Props) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [plusCard, setPlusCard] = useState(0);
+  const featuredPackage = PACKAGES[0];
   const visiblePackages = PACKAGES.filter(pkg =>
-    currency !== "USD" && currency !== "EUR" || hasExactStorePrice(currency, pkg.amount)
+    pkg.id !== featuredPackage.id &&
+    (currency !== "USD" && currency !== "EUR" || hasExactStorePrice(currency, pkg.amount))
   );
 
   return (
@@ -73,6 +75,104 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
         <h1 style={{ fontSize: 32, fontWeight: 800, color: "#111", letterSpacing: -0.5 }}>
           {t(language, "buyRobux")}
         </h1>
+      </div>
+
+      {/* Limited-time featured avatar item */}
+      <div style={{ padding: "20px 16px 8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <h2 style={{ fontSize: 17, fontWeight: 700, color: "#222", margin: 0 }}>
+            {t(language, "limitedAvatarItems")}
+          </h2>
+          <span style={{
+            background: "#202124",
+            color: "#fff",
+            borderRadius: 999,
+            padding: "5px 10px",
+            fontSize: 12,
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+          }}>
+            {t(language, "daysLeft")}
+          </span>
+        </div>
+
+        <button
+          onClick={() => onSelect(featuredPackage)}
+          style={{
+            width: "100%",
+            padding: 0,
+            border: "none",
+            borderRadius: 16,
+            overflow: "hidden",
+            background: "#eef0f5",
+            cursor: "pointer",
+            fontFamily: "inherit",
+            textAlign: "left",
+            display: "block",
+          }}
+        >
+          <div style={{
+            height: 218,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#eef0f5",
+            backgroundImage: [
+              "linear-gradient(30deg, rgba(255,255,255,0.32) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.32) 87.5%, rgba(255,255,255,0.32))",
+              "linear-gradient(150deg, rgba(255,255,255,0.32) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.32) 87.5%, rgba(255,255,255,0.32))",
+            ].join(","),
+            backgroundSize: "42px 74px",
+            backgroundPosition: "0 0, 21px 37px",
+          }}>
+            <img
+              src="/gold-crown-of-ozymandias.gif"
+              alt={t(language, "crownName")}
+              width={220}
+              height={220}
+              loading="eager"
+              decoding="async"
+              style={{ width: 220, height: 220, objectFit: "contain" }}
+            />
+          </div>
+
+          <div style={{ padding: "14px 22px 16px", background: "#f5f6f9" }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#222", marginBottom: 4 }}>
+              {t(language, "crownName")}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 14, color: "#222" }}>
+              <span>Roblox</span>
+              <img src="/verified-badge.svg" alt="Verificado" width={12} height={12} />
+            </div>
+          </div>
+
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            padding: "12px 14px",
+            background: "#dfe1e8",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+              <RobuxIcon size={24} />
+              <span style={{ fontSize: 20, fontWeight: 750, color: "#222" }}>
+                {featuredPackage.amount.toLocaleString(numberLocale(language))}
+              </span>
+            </div>
+            <span style={{
+              minWidth: 132,
+              padding: "11px 12px",
+              borderRadius: 10,
+              background: "#d2d5dd",
+              color: "#222",
+              fontSize: 14,
+              fontWeight: 700,
+              textAlign: "center",
+            }}>
+              {formatCurrency(featuredPackage.price, currency, language, featuredPackage.amount)}
+            </span>
+          </div>
+        </button>
       </div>
 
       {/* Packages section */}
