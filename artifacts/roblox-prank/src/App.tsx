@@ -37,6 +37,7 @@ export default function App() {
   const [modalState, setModalState] = useState<ModalState>("idle");
   const [robuxBalance, setRobuxBalance] = useState(0);
   const [sendOpen, setSendOpen] = useState(false);
+  const [daysRemaining, setDaysRemaining] = useState(19);
 
   if (isAdminRoute) {
     return <AdminPage />;
@@ -63,10 +64,11 @@ export default function App() {
   };
 
   if (!currency) {
-    return <LoginGate onEnter={(selectedCurrency, selectedLanguage, initialRobux) => {
+    return <LoginGate onEnter={(selectedCurrency, selectedLanguage, initialRobux, configuredDaysRemaining) => {
       setCurrency(selectedCurrency);
       setLanguage(selectedLanguage);
       setRobuxBalance(initialRobux);
+      setDaysRemaining(configuredDaysRemaining);
     }} onLanguageChange={handleLoginLanguageChange} />;
   }
 
@@ -79,6 +81,7 @@ export default function App() {
           onSend={() => setSendOpen(true)}
           currency={currency}
           language={language}
+          daysRemaining={daysRemaining}
         />
       </div>
 

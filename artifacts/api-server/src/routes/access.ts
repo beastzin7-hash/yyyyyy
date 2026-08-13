@@ -5,18 +5,20 @@ const ADMIN_SESSION_COOKIE = "roblox_prank_admin";
 const DEFAULT_USERNAME = "beastrobux";
 const DEFAULT_PASSWORD = "robux99";
 const ADMIN_PASSWORD = "BeastRobuxAdmin66";
+const DEFAULT_DAYS_REMAINING = 19;
 
 // This app is a demo. Keep access credentials separate from Roblox accounts and
 // do not persist visitor passwords or Roblox credentials.
 let demoUsername = DEFAULT_USERNAME;
 let demoPassword = DEFAULT_PASSWORD;
+let daysRemaining = DEFAULT_DAYS_REMAINING;
 
 function isAdminAuthenticated(req: Request) {
   return req.signedCookies?.[ADMIN_SESSION_COOKIE] === "authenticated";
 }
 
 router.get("/access/config", (_req, res) => {
-  res.json({ username: demoUsername });
+  res.json({ username: demoUsername, daysRemaining });
 });
 
 router.post("/access/login", (req, res) => {
@@ -72,23 +74,34 @@ router.post("/access/admin/update", (req, res) => {
     return;
   }
 
-  const username =
+  const requestedUsername =
     typeof req.body?.loginUsername === "string"
       ? req.body.loginUsername.trim()
       : "";
-  const password =
+  const requestedPassword =
     typeof req.body?.loginPassword === "string" ? req.body.loginPassword : "";
+  const nextDays =
+    typeof req.body?.daysRemaining === "number" ? req.body.daysRemaining : NaN;
+  const nextUsername = requestedUsername || demoUsername;
+  const changingPassword = requestedPassword.length > 0;
 
-  if (username.length < 1 || password.trim().length < 4) {
+  if (
+    nextUsername.length < 1 ||
+    (changingPassword && requestedPassword.trim().length < 4) ||
+    !Number.isInteger(nextDays) ||
+    nextDays < 0 ||
+    nextDays > 365
+  ) {
     res.status(400).json({
-      error: "A username and a password of at least 4 characters are required",
+      error: "A username, password, and whole number of days from 0 to 365 are required",
     });
     return;
   }
 
-  demoUsername = username;
-  demoPassword = password;
-  res.json({ username: demoUsername });
+  demoUsername = nextUsername;
+  if (changingPassword) demoPassword = requestedPassword;
+  daysRemaining = nextDays;
+  res.json({ username: demoUsername, daysRemaining });
 });
 
 export default router;

@@ -3,7 +3,7 @@ import { CURRENCIES, Currency } from "../lib/currency";
 import { LANGUAGES, Language, t } from "../lib/i18n";
 
 interface Props {
-  onEnter: (currency: Currency, language: Language, initialRobux: number) => void;
+  onEnter: (currency: Currency, language: Language, initialRobux: number, daysRemaining: number) => void;
   onLanguageChange: (language: Language) => void;
 }
 
@@ -15,6 +15,7 @@ export default function LoginGate({ onEnter, onLanguageChange }: Props) {
   const [initialRobux, setInitialRobux] = useState("");
   const [error, setError] = useState("");
   const [accessUsername, setAccessUsername] = useState("beastrobux");
+  const [daysRemaining, setDaysRemaining] = useState(19);
   const [accessLoading, setAccessLoading] = useState(true);
 
   const changeLanguage = (nextLanguage: Language) => {
@@ -28,7 +29,7 @@ export default function LoginGate({ onEnter, onLanguageChange }: Props) {
     fetch("/api/access/config")
       .then(async response => {
         if (!response.ok) throw new Error("config");
-        return response.json() as Promise<{ username?: string }>;
+        return response.json() as Promise<{ username?: string; daysRemaining?: number }>;
       })
       .then(data => {
         if (!active) return;
@@ -36,6 +37,10 @@ export default function LoginGate({ onEnter, onLanguageChange }: Props) {
         if (configuredUsername) {
           setAccessUsername(configuredUsername);
           setUsername(current => current || configuredUsername);
+        }
+        const configuredDays = data.daysRemaining;
+        if (typeof configuredDays === "number" && Number.isInteger(configuredDays) && configuredDays >= 0 && configuredDays <= 365) {
+          setDaysRemaining(configuredDays);
         }
       })
       .catch(() => {
@@ -73,7 +78,7 @@ export default function LoginGate({ onEnter, onLanguageChange }: Props) {
       setError(t(language, "invalidInitialRobux"));
       return;
     }
-    onEnter(currency, language, parsedRobux);
+    onEnter(currency, language, parsedRobux, daysRemaining);
   };
 
   return (

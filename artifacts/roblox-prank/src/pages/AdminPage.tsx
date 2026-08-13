@@ -8,13 +8,20 @@ export default function AdminPage() {
   const [adminPassword, setAdminPassword] = useState("");
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [daysRemaining, setDaysRemaining] = useState("19");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("/api/access/config")
-      .then(response => response.json() as Promise<{ username?: string }>)
-      .then(data => setLoginUsername(data.username ?? ""))
+      .then(response => response.json() as Promise<{ username?: string; daysRemaining?: number }>)
+      .then(data => {
+        setLoginUsername(data.username ?? "");
+        const configuredDays = data.daysRemaining;
+        if (typeof configuredDays === "number" && Number.isInteger(configuredDays) && configuredDays >= 0 && configuredDays <= 365) {
+          setDaysRemaining(String(configuredDays));
+        }
+      })
       .catch(() => setError(t(language, "accessUnavailable")));
 
     fetch("/api/access/admin/status", { credentials: "same-origin" })
@@ -45,11 +52,16 @@ export default function AdminPage() {
     event.preventDefault();
     setError("");
     setMessage("");
+    const parsedDays = Number(daysRemaining);
+    if (!Number.isInteger(parsedDays) || parsedDays < 0 || parsedDays > 365) {
+      setError(t(language, "invalidDays"));
+      return;
+    }
     const response = await fetch("/api/access/admin/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
-      body: JSON.stringify({ loginUsername, loginPassword }),
+      body: JSON.stringify({ loginUsername, loginPassword, daysRemaining: parsedDays }),
     });
     if (response.status === 403) {
       setAuthenticated(false);
@@ -61,7 +73,7 @@ export default function AdminPage() {
       return;
     }
     setLoginPassword("");
-    setMessage(t(language, "credentialsSaved"));
+    setMessage(`${t(language, "credentialsSaved")} ${t(language, "daysSaved")}`);
   };
 
   const logout = async () => {
@@ -185,6 +197,20 @@ export default function AdminPage() {
               onChange={event => setLoginPassword(event.target.value)}
               placeholder={t(language, "newPassword")}
               autoComplete="new-password"
+              style={inputStyle}
+            />
+            <label style={labelStyle}>{t(language, "adminFeaturedDays")}</label>
+            <p style={{ color: "#626871", lineHeight: 1.5, margin: "-2px 0 8px", fontSize: 13 }}>
+              {t(language, "adminDaysHint")}
+            </p>
+            <input
+              type="number"
+              min={0}
+              max={365}
+              step={1}
+              value={daysRemaining}
+              onChange={event => setDaysRemaining(event.target.value)}
+              inputMode="numeric"
               style={inputStyle}
             />
             <button type="submit" style={primaryButtonStyle}>

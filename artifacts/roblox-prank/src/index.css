@@ -34,6 +34,16 @@
 }
 .fade-in { animation: fadeIn 0.3s ease forwards; }
 
+.buy-page-hero {
+  background-color: #fff;
+  background-image:
+    repeating-radial-gradient(ellipse at 18% -30%, transparent 0 28px, rgba(210, 213, 220, 0.27) 29px 30px, transparent 31px 48px),
+    repeating-radial-gradient(ellipse at 82% -35%, transparent 0 34px, rgba(210, 213, 220, 0.2) 35px 36px, transparent 37px 58px),
+    repeating-linear-gradient(78deg, transparent 0 54px, rgba(214, 217, 224, 0.16) 55px 56px, transparent 57px 88px);
+  background-size: 480px 360px, 520px 390px, 440px 420px;
+  background-position: center top;
+}
+
 @keyframes slideUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }

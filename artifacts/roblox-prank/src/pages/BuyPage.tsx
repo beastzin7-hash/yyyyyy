@@ -10,6 +10,7 @@ interface Props {
   onSend: () => void;
   currency: Currency;
   language: Language;
+  daysRemaining: number;
 }
 
 const FAQ_ITEMS = [
@@ -18,7 +19,7 @@ const FAQ_ITEMS = [
   { q: "¿Los Robux caducan?", a: "No, los Robux no caducan mientras tu cuenta esté activa." },
 ];
 
-export default function BuyPage({ onSelect, robuxBalance, onSend, currency, language }: Props) {
+export default function BuyPage({ onSelect, robuxBalance, onSend, currency, language, daysRemaining }: Props) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [plusCard, setPlusCard] = useState(0);
   const featuredPackage = PACKAGES[0];
@@ -70,6 +71,7 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
         </button>
       </div>
 
+      <div className="buy-page-hero">
       {/* Title */}
       <div style={{ padding: "24px 16px 8px" }}>
         <h1 style={{ fontSize: 32, fontWeight: 800, color: "#111", letterSpacing: -0.5 }}>
@@ -92,7 +94,7 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
             fontWeight: 600,
             whiteSpace: "nowrap",
           }}>
-            {t(language, "daysLeft")}
+            {daysRemaining} {t(language, "daysRemainingSuffix")}
           </span>
         </div>
 
@@ -173,6 +175,7 @@ export default function BuyPage({ onSelect, robuxBalance, onSend, currency, lang
             </span>
           </div>
         </button>
+      </div>
       </div>
 
       {/* Packages section */}
